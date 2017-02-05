@@ -1,0 +1,171 @@
+Google Search:
+
+Eb = function(a, b) {
+            var c = chrome.extension.getBackgroundPage();
+            (c = (c = c && c.n && c.n.search && c.n.search.background) && c.ra) || (c = "https://clients1.google.com/complete/search");
+            c = ia(c);
+            c = new P(c);
+            T(c, "client", "htsa");
+            U(c, "mw");
+            U(c, "sh");
+            U(c, "rh");
+            U(c, "inputencoding");
+            U(c, "outputencoding");
+            T(c, "q", b);
+            ib(c.toString(), function() {
+                a.V = qb(this);
+                Fb(a)
+            })
+        },
+
+
+        https://www.google.pl/search?sourceid=chrome&q=pracownika&oq=pracownika&gs_htsa=1&gws_rd=ssl
+
+        sourceid=chrome&q=pracownika&oq=pracownika&gs_htsa=1&gws_rd=ssl
+
+        In addition to RickyA´s answer you can filter the suggestion by media using bs parameter:
+
+http://clients1.google.com/complete/search?hl=en&q=stackoverflow&output=toolbar&ds=
+
+youtube: ds=yt
+
+books: ds=bo
+
+products: ds=sh
+
+news: ds=n
+
+images: ds=i
+
+web: ds=
+
+recipes: ds=r
+
+
+
+https://www.google.com/searchdomaincheck?format=domain
+
+
+(h = h && h.ta) || (h = "http://www.google.com/search");
+                            h = ia(h);
+                            h = new P(h);
+                            T(h, "sourceid", "chrome");
+                            U(h, "rls");
+                            U(h, "ie");
+                            U(h, "oe");
+                            d ? T(h, "q", d) : U(h, "q");
+                            e && T(h, "aq", e);
+                            f && T(h, "oq", f);
+                            (d = g && g.n && g.n.ua) && (d = d.sa) && 0 < d.length && T(h, "rlz", d);
+                            h = h.toString()
+                                .replace(/%20/g, "+");
+                            c && (0 < c.length && ("?" == c.charAt(0) || "&" == c.charAt(0)) && (c = c.substr(1)), h += "&" + c);
+                            0 < h.length - 2047 && (h = h.substring(0, 2047));
+                            c = h
+
+
+Instrukcja:
+https://developers.google.com/web-search/docs/?csw=1#the-hello-world-of-google-web-search-api
+Argumenty wołania:
+https://developers.google.com/web-search/docs/reference?csw=1#gxxx---methods
+
+
+https://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=Paris%20Hilton
+
+
+// The request also includes the userip parameter which provides the end
+// user's IP address. Doing so will help distinguish this legitimate
+// server-side traffic from traffic which doesn't come from an end-user.
+URL url = new URL(
+    "https://ajax.googleapis.com/ajax/services/search/web?v=1.0&"
+    + "q=Paris%20Hilton&userip=USERS-IP-ADDRESS");
+
+Finally, if you're using the RESTful interface, all you have to do is append a "gl" URL parameter to your request: 
+http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=flowers&gl=fr
+Most valid country codes will work, as long as Google has a home page on that country's top level domain (e.g. google.es). If you use an invalid or unsupported country code, you'll get an error message letting you know.
+
+
+
+Code to retrieve image URL of the first thumbnail:
+
+public static String FindImage(String question, String ua) {
+            String finRes = "";
+
+    try {
+            String googleUrl = "https://www.google.com/search?tbm=isch&q=" + question.replace(",", "");
+            Document doc1 = Jsoup.connect(googleUrl).userAgent(ua).timeout(10 * 1000).get();
+            Element media = doc1.select("[data-src]").first();
+            String finUrl = media.attr("abs:data-src"); 
+
+            finRes= "<a href=\"http://images.google.com/search?tbm=isch&q=" + question + "\"><img src=\"" + finUrl.replace("&quot", "") + "\" border=1/></a>";
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return finRes;
+    }
+
+
+Guide:
+
+question - image search term
+
+ua - user agent of the browser
+
+https://examples.javacodegeeks.com/enterprise-java/html/download-images-from-a-website-using-jsoup/
+
+
+
+String googleUrl = "https://www.google.com/search?tbm=isch&q=" + question.Replace(",", "");
+                    NSoup.Nodes.Document htmlDoc = NSoupClient.Connect(googleUrl).UserAgent(ua).Timeout(10 * 1000).Get();
+                    NSoup.Select.Elements links = htmlDoc.Select("a");
+                    foreach (NSoup.Nodes.Element link in links) {
+                        if (link.Select("img") != null)
+                        {
+                            finRes = link.Attr("abs:href");
+                            //break; //return first element
+                            //getImage(src);
+                        }
+                    }
+
+
+https://www.google.com/search?safe=off&espv=2&biw=1920&bih=979&source=lnms&tbm=isch&sa=X&dpr=1&q=jabłko
+https://www.google.pl/search?safe=off&espv=2&biw=1920&bih=979&source=lnms&tbm=isch&sa=X&dpr=1&q=jab%C5%82ko&gws_rd=cr&ei=LQD9VrTrPIe4ygOZzp3oDA
+
+
+
+Poniższe wyciąga miniaturki:
+
+String googleUrl = "https://www.google.com/search?tbm=isch&q=" + question.Replace(",", "");
+                    NSoup.Nodes.Document htmlDoc = NSoupClient.Connect(googleUrl).UserAgent(ua).Timeout(10 * 1000).Get();
+                    NSoup.Select.Elements images = htmlDoc.Select("img");
+                    foreach (NSoup.Nodes.Element img in images) {
+                        NSoup.Select.Elements links = img.Parent.Select("a[href]");
+                        if (links.Count() > 0) { //is there a link around img?
+                            NSoup.Nodes.Element link = img.Parent.Select("a[href]").First();
+                            finRes = img.Parent.Attr("abs:href"); //link to page containing the picture
+                            //String src = img.AbsUrl("src");
+                            //break; //return first element
+                            //getImage(src);
+                        }
+                    }
+
+
+Poniższe wyciąga całe obrazki: (zmienione tylko com na pl) - dostaje inna stronę wynikową dlatego inne parsowanie:
+String googleUrl = "https://www.google.pl/search?tbm=isch&q=" + question.Replace(",", "");
+                    NSoup.Nodes.Document htmlDoc = NSoupClient.Connect(googleUrl).UserAgent(ua).Timeout(10 * 1000).Get();
+                    NSoup.Select.Elements images = htmlDoc.Select("div.rg_di.rg_el.ivg-i img"); //div with class="rg_di rg_el ivg-i" containing img
+                    foreach (NSoup.Nodes.Element img in images) {
+                        NSoup.Select.Elements links = img.Parent.Select("a[href]");
+                        if (links.Count() > 0) { //is there a link around img?
+                            NSoup.Nodes.Element link = img.Parent.Select("a[href]").First();
+                            String href = img.Parent.Attr("abs:href"); //link which needs to be parsed to get the full img url
+                            Regex regex = new Regex("imgurl=(.*?)&imgrefurl="); //Everything between "imgurl=" and "&imgrefurl="
+                            var v = regex.Match(href);
+                            String imgURL = v.Groups[1].ToString();
+                            //break; //return first element
+                            //getImage(src);
+                        }
+                    }
+                    

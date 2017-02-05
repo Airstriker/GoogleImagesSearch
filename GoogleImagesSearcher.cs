@@ -81,6 +81,8 @@ namespace GoogleImagesSearch
                     //Handling correctly auto redirects... 
                     checkForRedirectsOnHTMLDocument(ref htmlDoc, userAgent);
 
+                    /*
+                    //This is old method
                     NSoup.Select.Elements images = htmlDoc.Select("div.rg_di.rg_el.ivg-i img"); //div with class="rg_di rg_el ivg-i" containing img
                     foreach (NSoup.Nodes.Element img in images) {
                         NSoup.Select.Elements links = img.Parent.Select("a[href]");
@@ -94,6 +96,20 @@ namespace GoogleImagesSearch
                                     String imgURL = v.Groups[1].ToString();
                                     imagesList.Add(imgURL);
                                 }
+                            }
+                        }
+                    }
+                    */
+                    NSoup.Select.Elements div_with_images = htmlDoc.Select("div.y.yi div.rg_di.rg_bx.rg_el.ivg-i"); //div with class="y yi" containing div with class="rg_di rg_bx rg_el ivg-i"
+                    foreach (NSoup.Nodes.Element div_with_image in div_with_images) {
+                        NSoup.Nodes.Element rg_meta_div = div_with_image.Select("div.rg_meta").First();
+                        String text_where_the_img_is = rg_meta_div.ToString();
+                        Regex regex = new Regex("ou&quot;:&quot;(.*?)&quot;"); //Everything between "ou&quot;:&quot;" and "&quot;"
+                        var v = regex.Match(text_where_the_img_is);
+                        if (v != null && v.Groups.Count == 2) {
+                            if (v.Groups[1].Value != String.Empty) {
+                                String imgURL = v.Groups[1].ToString();
+                                imagesList.Add(imgURL);
                             }
                         }
                     }
@@ -133,7 +149,7 @@ namespace GoogleImagesSearch
                         if (v.Groups[1].Value != String.Empty) {
                             //Need to know the base uri:
                             String baseURI = getBaseURI(htmlDoc);
-                            String urlToFetch = baseURI + v.Groups[1].ToString().Replace("\\75", "=").Replace("\\075", "=").Replace("\\46", "&").Replace("\\046", "&"); //converting ASCII octet codes to characters
+                            String urlToFetch = baseURI + v.Groups[1].ToString().Replace("\\75", "=").Replace("\\075", "=").Replace("\\x3d", "=").Replace("\\46", "&").Replace("\\046", "&").Replace("\\x26", "&"); //converting ASCII octet codes to characters
                             htmlDoc = NSoupClient.Connect(urlToFetch).UserAgent(userAgent).Timeout(10 * 1000).Get();
                             checkForRedirectsOnHTMLDocument(ref htmlDoc, userAgent);
                         }

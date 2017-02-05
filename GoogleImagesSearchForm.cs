@@ -58,14 +58,18 @@ namespace GoogleImagesSearch
                     this.Cursor = Cursors.WaitCursor;
                     this._lblStatus.Text = "Searching...";
                     this._lblStatus.Update();
-                    List<String> images = t.SearchForImages (this._editImageText.Text.Trim());
-                    if (t.Error == null && images.Count > 0) {
+                    List<String> images_urls = t.SearchForImages (this._editImageText.Text.Trim());
+                    if (t.Error == null && images_urls.Count > 0) {
                         //Show first image only
-                        Bitmap bitmap = ImageUtil.LoadPicture(images.First());
-                        Image image = ImageUtil.ResizeImage(bitmap, pictureBox1, true);
-                        pictureBox1.Image = image;
-                        if (bitmap != null) bitmap.Dispose();
-                        //if (image != null) image.Dispose();
+                        foreach (String image_url in images_urls) {
+                            Bitmap bitmap = ImageUtil.LoadPicture(image_url);
+                            if (bitmap != null) { //sometime the server refuses getting the image directly
+                                Image image = ImageUtil.ResizeImage(bitmap, pictureBox1, true);
+                                pictureBox1.Image = image;
+                                if (bitmap != null) bitmap.Dispose();
+                                break; //show only one image
+                            }
+                        }
                     }
                     else {
                         MessageBox.Show (t.Error.Message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
